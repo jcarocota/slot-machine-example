@@ -18,10 +18,9 @@ export const App = (appWidth:number = 600, appHeight:number = 360) => {
 
         const appContainer = new PIXI.Container();  
         appContainer.width = appWidth;
-        appContainer.height = appHeight;      
-        app.stage.addChild(appContainer);
-
-        
+        appContainer.height = appHeight; 
+             
+        app.stage.addChild(appContainer);        
 
         appContainer.x = 0;
         appContainer.y = 0;
