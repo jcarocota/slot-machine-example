@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { Globals } from './Globals';
 import { LoaderConfig } from './LoaderConfig';
 import { Slot, SlotObject } from './Slot';
 
@@ -6,7 +7,9 @@ export interface ColumnObject {
     colNum: number,
     container: PIXI.Container,
     slots: SlotObject[],
-    moveSlots: (spinSpeed:number) => void
+    setColumnSpinning: (spinning:boolean) => void
+    intervalSpinning: NodeJS.Timer,
+    decelerateIndex:number
 
 }
 
@@ -28,9 +31,18 @@ export const ColumnSlots = (
 
     const slots:SlotObject[] = [];
 
-    for(let i:number = 0; i < numSlots+numSlotsOffset; i++) {
+    const decelerateIndex: number = 0;
+
+    const getTagSlot = () => {
         const numFruit:number = Math.ceil(Math.random()*16);
         const tagSlot:string = 'fruit'+ numFruit;
+
+        return tagSlot
+    };
+
+    for(let i:number = 0; i < numSlots+numSlotsOffset; i++) {
+
+        const tagSlot:string = getTagSlot();
         const url:string = LoaderConfig[tagSlot];
         const slot:SlotObject = Slot(url, spriteWidth, spriteHeight, tagSlot);
 
@@ -42,29 +54,57 @@ export const ColumnSlots = (
         slots.push(slot);
     }
 
-    const moveSlots = async (spinSpeed:number) => {
-        if(!spinSpeed) {
-            return;
-        }
+    let intervalSpinning:NodeJS.Timer = null;
 
-        if(slots[0].sprite.y <= -60) {
-            let slot:SlotObject = slots[0];
-            slots.shift();
-            slots.push(slot);
-            slot.sprite.y = slots[slots.length-2].sprite.y + 120;
-        }
-        
-        for(let slot of slots) {
-            slot.sprite.y-=spinSpeed;
-        }
+    const turnOnColumnSpinning = () => {
+        const delay = 10;
 
+        let spinSpeed:number = Globals.spinSpeed;
+        const intervalSpinning = setInterval(() => {
+            
+            if(slots[0].sprite.y <= -1.5*spriteHeight/2) {
+                let slot:SlotObject = slots[0];
+                slots.shift();
+                slots.push(slot);
+                const tagSlot:string = getTagSlot();
+                const url:string = LoaderConfig[tagSlot];
+                slot.sprite.texture = PIXI.Texture.from(url);
+                slot.tag = tagSlot;
+                slot.sprite.y = slots[slots.length-2].sprite.y + spriteHeight;
+            }
+            
+            for(let slot of slots) {
+                slot.sprite.y-=spinSpeed;
+            }
+            spinSpeed-=column.decelerateIndex;
+            console.log(decelerateIndex);
+        }, delay);
+
+        return intervalSpinning;
     };
+
+    const turnOffColumnSpinning = (intervalSpinning:NodeJS.Timer) => {
+        clearInterval(intervalSpinning);
+        slots.forEach((slot, i) => {
+            slot.sprite.y = spriteY+((i+1)*spriteHeight);
+        });
+    };
+
+    const setColumnSpinning = (spinning:boolean) => {
+        if(Globals.spinSpeed && spinning) {
+            intervalSpinning = turnOnColumnSpinning();
+        } else if(intervalSpinning) {
+            turnOffColumnSpinning(intervalSpinning);
+        }
+    }
 
     const column:ColumnObject = {
         colNum: colNum,
         container: container,
         slots: slots,
-        moveSlots: moveSlots 
+        setColumnSpinning: setColumnSpinning,
+        intervalSpinning: intervalSpinning,
+        decelerateIndex: decelerateIndex 
     };
 
     return column;

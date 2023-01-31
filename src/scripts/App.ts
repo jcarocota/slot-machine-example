@@ -35,21 +35,41 @@ export const App = (appWidth:number = 600, appHeight:number = 360) => {
             appContainer.addChild(column.container);
         }
 
-        let spinning:boolean = true;
+        /*app.ticker.add((dt:number) => {
 
-        app.ticker.add((dt:number) => {
-
-            if(spinning) {
+            if(Globals.spinning) {
                 for(let column of Globals.colums) {    
                     column.moveSlots(Globals.spinSpeed);
                 }
             }
             
-        });
+        });*/
 
-        setTimeout(() => {
-            spinning = false;
-        }, Globals.spinDurationInMillis);
+        appContainer.interactive = true;
+        appContainer.on('pointerdown',(ev) => {
+            if(Globals.spinning) {
+                return;
+            }
+
+            Globals.spinning = true;
+            let i = 0;
+            let numColumnsSpinning = Globals.colums.length;
+            for(let column of Globals.colums) {
+                setTimeout(() => {
+                    column.decelerateIndex = -0.1;
+                    column.setColumnSpinning(true);
+                    setTimeout(() => {
+                        column.decelerateIndex = 0.4;
+                    }, Globals.spinDurationInMillis/2);
+                    setTimeout(() => {
+                        column.setColumnSpinning(false);
+                        numColumnsSpinning--;
+                        Globals.spinning = numColumnsSpinning > 0;
+                    }, Globals.spinDurationInMillis);
+                }, i*Globals.timeBetweenSpinColumns);
+                i++;
+            }
+        });
 
     }
 

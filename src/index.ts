@@ -1,8 +1,8 @@
-import * as PIXI from 'pixi.js';
 import { App } from './scripts/app';
+import { Globals } from './scripts/Globals';
 
-const appWidth:number = 600;
-const appHeight:number = 360;
+const appWidth:number = Globals.appWidth;
+const appHeight:number = Globals.appHeight;
 
 App(appWidth, appHeight);
 
