@@ -7,7 +7,7 @@ export const App = (appWidth:number = 600, appHeight:number = 360) => {
         //view: (document.getElementById("pixi-canvas") as HTMLCanvasElement),
         resolution: window.devicePixelRatio || 1,
         autoDensity: true,
-        backgroundColor: 0x6495ed,
+        backgroundColor: 0x0d2331,
         width: appWidth,
         height: appHeight
     });
@@ -16,11 +16,12 @@ export const App = (appWidth:number = 600, appHeight:number = 360) => {
 
     const run = () => {
 
-        const appContainer = new PIXI.Container();        
+        const appContainer = new PIXI.Container();  
+        appContainer.width = appWidth;
+        appContainer.height = appHeight;      
         app.stage.addChild(appContainer);
 
-        appContainer.width = appWidth;
-        appContainer.height = appHeight;
+        
 
         appContainer.x = 0;
         appContainer.y = 0;
@@ -59,7 +60,7 @@ export const App = (appWidth:number = 600, appHeight:number = 360) => {
                     column.decelerateIndex = -0.1;
                     column.setColumnSpinning(true);
                     setTimeout(() => {
-                        column.decelerateIndex = 0.4;
+                        column.decelerateIndex = 0.6;
                     }, Globals.spinDurationInMillis/2);
                     setTimeout(() => {
                         column.setColumnSpinning(false);

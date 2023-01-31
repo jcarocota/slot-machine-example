@@ -22,18 +22,20 @@ export const ColumnSlots = (
     container.x = x;
     container.y = y;
 
-    const numSlotsOffset:number = 2;
+    const numSlotsOffset:number = 4;
     
     const spriteWidth:number = columnWidth;
     const spriteHeight:number = columnHeight/numSlots;
     const spriteX:number = spriteWidth /2;
-    const spriteY:number = (spriteHeight /2) - (spriteHeight*(numSlotsOffset/2));
+    //const spriteY:number = (spriteHeight /2) - (spriteHeight*(numSlotsOffset/2));
+    const spriteY:number = -(numSlotsOffset/2)*(spriteHeight/2) - (spriteHeight/2);
+    console.log("spriteY", spriteY)
 
     const slots:SlotObject[] = [];
 
     const decelerateIndex: number = 0;
 
-    const getTagSlot = () => {
+    const getTagSlot: () => string = () => {
         const numFruit:number = Math.ceil(Math.random()*16);
         const tagSlot:string = 'fruit'+ numFruit;
 
@@ -62,7 +64,7 @@ export const ColumnSlots = (
         let spinSpeed:number = Globals.spinSpeed;
         const intervalSpinning = setInterval(() => {
             
-            if(slots[0].sprite.y <= -1.5*spriteHeight/2) {
+            if(slots[0].sprite.y < spriteY) {
                 let slot:SlotObject = slots[0];
                 slots.shift();
                 slots.push(slot);
@@ -86,7 +88,7 @@ export const ColumnSlots = (
     const turnOffColumnSpinning = (intervalSpinning:NodeJS.Timer) => {
         clearInterval(intervalSpinning);
         slots.forEach((slot, i) => {
-            slot.sprite.y = spriteY+((i+1)*spriteHeight);
+            slot.sprite.y = spriteY+((i+numSlotsOffset/2)*spriteHeight);
         });
     };
 
